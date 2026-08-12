@@ -37,16 +37,22 @@ export default function Register() {
     setLoading(true);
     try {
       const { data } = await api.post("/users/register", {
-        name:     formData.fullName,
-        email:    formData.email,
-        phone:    formData.phone,
-        password: formData.password,
+        name:            formData.fullName.trim(),
+        email:           formData.email.trim(),
+        phone:           formData.phone.trim(),
+        password:        formData.password,
+        confirmPassword: formData.confirmPassword,
       });
       localStorage.setItem("token", data.token);
       login(data);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Error creating account. Try again.");
+      setError(
+        err.response?.data?.message ||
+          (err.code === "ERR_NETWORK" || !err.response
+            ? "Unable to connect to server. Please ensure backend is running and connected to MongoDB."
+            : "Error creating account. Try again.")
+      );
       setLoading(false);
     }
   };

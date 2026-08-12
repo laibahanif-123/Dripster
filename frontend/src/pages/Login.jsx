@@ -37,7 +37,7 @@ export default function Login() {
     setError("");
     try {
       const { data } = await api.post("/users/login", {
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
       });
       localStorage.setItem("token", data.token);
@@ -45,7 +45,12 @@ export default function Login() {
       if (data.isAdmin) navigate("/admin");
       else navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      setError(
+        err.response?.data?.message ||
+          (err.code === "ERR_NETWORK" || !err.response
+            ? "Unable to connect to server. Please ensure backend is running and connected to MongoDB."
+            : "Invalid email or password")
+      );
       setLoading(false);
     }
   };

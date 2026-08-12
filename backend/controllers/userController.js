@@ -8,6 +8,9 @@ const registerUser = async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please fill all required fields" });
     }
+
+    const cleanEmail = email.toLowerCase().trim();
+
     if (password.length < 8) {
       return res.status(400).json({ message: "Password must be at least 8 characters" });
     }
@@ -15,12 +18,17 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: cleanEmail });
     if (userExists) {
       return res.status(400).json({ message: "User with this email already exists" });
     }
 
-    const user = await User.create({ name, email, phone, password });
+    const user = await User.create({
+      name: name.trim(),
+      email: cleanEmail,
+      phone: phone ? phone.trim() : "",
+      password,
+    });
 
     res.status(201).json({
       _id: user._id,
@@ -31,14 +39,20 @@ const registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message || "Registration failed" });
   }
 };
 
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Please provide both email and password" });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: cleanEmail });
 
     if (user && (await user.matchPassword(password))) {
       res.json({
@@ -53,7 +67,7 @@ const loginUser = async (req, res) => {
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message || "Login failed" });
   }
 };
 

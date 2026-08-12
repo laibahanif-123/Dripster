@@ -9,7 +9,7 @@ const seedUsers = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("✅ Connected to MongoDB for seeding users");
 
-    // Check if test admin exists
+    // Admin user
     let admin = await User.findOne({ email: "laibahanif0909@gmail.com" });
     if (!admin) {
       admin = await User.create({
@@ -18,12 +18,15 @@ const seedUsers = async () => {
         password: "password123",
         isAdmin: true,
       });
-      console.log("👑 Admin user created");
+      console.log("👑 Admin user created with password: password123");
     } else {
-      console.log("👑 Admin user already exists");
+      admin.password = "password123";
+      admin.isAdmin = true;
+      await admin.save();
+      console.log("👑 Admin user updated (password reset to: password123)");
     }
 
-    // Check if test user exists
+    // Test user
     let user = await User.findOne({ email: "user@test.com" });
     if (!user) {
       user = await User.create({
@@ -32,9 +35,11 @@ const seedUsers = async () => {
         password: "password123",
         isAdmin: false,
       });
-      console.log("👤 Test user created");
+      console.log("👤 Test user created with password: password123");
     } else {
-      console.log("👤 Test user already exists");
+      user.password = "password123";
+      await user.save();
+      console.log("👤 Test user updated (password reset to: password123)");
     }
 
     process.exit();

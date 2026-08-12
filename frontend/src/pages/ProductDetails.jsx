@@ -3,6 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import api from "../services/api";
 
+import fallbackProducts from "../data/products";
+
 const sizes = ["Small", "Medium", "Large"];
 const sugarLevels = ["No Sugar", "Less Sugar", "Normal", "Extra Sugar"];
 
@@ -25,9 +27,20 @@ export default function ProductDetails() {
     const fetchProduct = async () => {
       try {
         const { data } = await api.get(`/products/${id}`);
-        setProduct(data);
+        if (data && data._id) {
+          setProduct(data);
+        } else {
+          const found = fallbackProducts.find((p) => String(p.id) === String(id) || String(p._id) === String(id));
+          if (found) setProduct(found);
+          else setError("Product not found.");
+        }
       } catch (err) {
-        setError("Product not found or could not be loaded.");
+        const found = fallbackProducts.find((p) => String(p.id) === String(id) || String(p._id) === String(id));
+        if (found) {
+          setProduct(found);
+        } else {
+          setError("Product not found or could not be loaded.");
+        }
       } finally {
         setLoading(false);
       }

@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import api from "../services/api";
 
+import fallbackProducts from "../data/products";
+
 const categories = ["All", "Hot Coffee", "Cold Coffee", "Tea", "Pastries", "Cakes", "Snacks"];
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=500&q=80";
 
 export default function MenuPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
 
@@ -17,9 +18,13 @@ export default function MenuPage() {
     const fetchProducts = async () => {
       try {
         const { data } = await api.get("/products");
-        setProducts(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data);
+        } else {
+          setProducts(fallbackProducts);
+        }
       } catch (err) {
-        setError("Could not load menu. Please try again later.");
+        setProducts(fallbackProducts);
       } finally {
         setLoading(false);
       }

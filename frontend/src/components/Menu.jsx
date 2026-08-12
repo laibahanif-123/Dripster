@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 
+import fallbackProducts from "../data/products";
+
 export default function Menu() {
   const [items, setItems] = useState([]);
 
@@ -9,10 +11,13 @@ export default function Menu() {
     const fetchFeatured = async () => {
       try {
         const { data } = await api.get("/products");
-        // Get the first 5 products for the featured list
-        setItems(data.slice(0, 5));
+        if (Array.isArray(data) && data.length > 0) {
+          setItems(data.slice(0, 5));
+        } else {
+          setItems(fallbackProducts.slice(0, 5));
+        }
       } catch (err) {
-        console.error("Failed to load featured products");
+        setItems(fallbackProducts.slice(0, 5));
       }
     };
     fetchFeatured();

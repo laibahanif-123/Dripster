@@ -11,11 +11,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://brew-haven-one.vercel.app",
-  "https://brew-haven-ehzj.vercel.app",
-  "https://brew-haven-c8gi.vercel.app",
-  "https://brew-haven-orcin-xi.vercel.app",
-  "https://brew-haven-y1xh.vercel.app",
+  "https://dripster.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 

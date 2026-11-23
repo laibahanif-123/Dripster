@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useSettingsStore } from "../store/settingsStore";
 import api from "../services/api";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiShield, FiUser } from "react-icons/fi";
 
 export default function Login() {
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
+  const settings = useSettingsStore((s) => s.settings);
+  const cafeName = settings?.cafeName || "Dripster";
   const imgRef = useRef(null);
 
   const [formData, setFormData] = useState({ email: "", password: "", remember: false });
@@ -31,6 +34,11 @@ export default function Login() {
     setFormData((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
   };
 
+  const handleQuickFill = (email, password) => {
+    setFormData((p) => ({ ...p, email, password }));
+    setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -42,8 +50,7 @@ export default function Login() {
       });
       localStorage.setItem("token", data.token);
       login(data);
-      if (data.isAdmin) navigate("/admin");
-      else navigate("/");
+      navigate("/");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -75,10 +82,10 @@ export default function Login() {
         <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/60 to-espresso/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-espresso" />
 
-        {/* Top-left BH badge */}
+        {/* Top-left badge */}
         <Link to="/" className="absolute top-8 left-8 z-20 no-underline">
-          <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso/70 backdrop-blur-md flex items-center justify-center font-mono text-[11px] tracking-widest text-crema hover:scale-110 transition-transform">
-            bh
+          <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso/70 backdrop-blur-md flex items-center justify-center font-mono text-[11px] tracking-widest text-crema uppercase hover:scale-110 transition-transform">
+            dr
           </div>
         </Link>
 
@@ -89,13 +96,13 @@ export default function Login() {
         >
           {/* Label */}
           <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-crema mb-4">
-            ☕ Brew Haven
+            ☕ {cafeName}
           </p>
 
           {/* Tagline */}
           <h2 className="font-display text-4xl text-cream leading-snug mb-6">
-            Your perfect cup,<br />
-            <span className="text-crema italic">waiting for you.</span>
+            Where every sip,<br />
+            <span className="text-crema italic">becomes a ritual.</span>
           </h2>
 
           {/* Divider */}
@@ -104,7 +111,7 @@ export default function Login() {
           {/* Testimonial */}
           <div className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-5">
             <p className="text-cream/60 text-sm italic leading-relaxed mb-4">
-              "I've tried specialty coffee in Dubai and London. Brew Haven holds its own — every single time."
+              "I've tried specialty coffee in Dubai and London. {cafeName} holds its own — pure craft, every single time."
             </p>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-crema/20 border border-crema/30 flex items-center justify-center font-display text-crema text-sm">
@@ -142,8 +149,8 @@ export default function Login() {
         {/* Mobile Logo */}
         <div className="lg:hidden mb-8">
           <Link to="/" className="no-underline">
-            <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema">
-              bh
+            <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema uppercase">
+              dr
             </div>
           </Link>
         </div>
@@ -153,11 +160,11 @@ export default function Login() {
           className="w-full max-w-sm relative z-10"
           style={{ animation: mounted ? "fadeUp 0.7s ease both" : "none", animationDelay: "0.1s" }}
         >
-          {/* Desktop BH logo */}
+          {/* Desktop logo */}
           <div className="hidden lg:flex justify-center mb-8">
             <Link to="/" className="no-underline">
-              <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema hover:scale-110 transition-transform">
-                bh
+              <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema uppercase hover:scale-110 transition-transform">
+                dr
               </div>
             </Link>
           </div>
@@ -185,6 +192,33 @@ export default function Login() {
               <p className="text-rust text-sm">{error}</p>
             </div>
           )}
+
+          {/* Quick Demo Credentials */}
+          <div className="mb-6 p-3.5 bg-espresso-2/70 border border-cream/10 rounded-xl space-y-2">
+            <p className="font-mono text-[10px] tracking-widest uppercase text-cream-dim text-center">
+              ⚡ Quick Demo Login
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleQuickFill("laibahanif0909@gmail.com", "password123")}
+                className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-crema/10 hover:bg-crema/20 border border-crema/30 font-mono text-[11px] text-crema transition-colors"
+                title="Fill Admin Credentials"
+              >
+                <FiShield size={13} />
+                <span>Admin Login</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill("user@test.com", "password123")}
+                className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-cream/5 hover:bg-cream/10 border border-cream/15 font-mono text-[11px] text-cream-dim hover:text-cream transition-colors"
+                title="Fill Customer Credentials"
+              >
+                <FiUser size={13} />
+                <span>Customer</span>
+              </button>
+            </div>
+          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">

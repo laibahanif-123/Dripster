@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { FiShoppingBag, FiPackage, FiPlusCircle, FiSettings } from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
+import { useSettingsStore } from "../../store/settingsStore";
 
 export default function AdminDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   const { userInfo, logout } = useAuthStore();
+  const settings = useSettingsStore((state) => state.settings);
 
   const navs = [
     { name: "Live Orders", path: "/admin/orders", icon: <FiShoppingBag size={15} /> },
@@ -27,7 +29,9 @@ export default function AdminDashboard() {
       <aside className="w-64 flex flex-col border-r border-cream/10 bg-espresso-2/30">
         <div className="p-8 border-b border-cream/10">
           <h2 className="font-display text-3xl text-crema tracking-wide">Admin</h2>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-cream-dim mt-2">Brew Haven</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-cream-dim mt-2 truncate">
+            {settings?.cafeName || "Dripster"}
+          </p>
         </div>
         
         <nav className="flex-1 p-6 flex flex-col gap-2 overflow-y-auto">

@@ -51,7 +51,7 @@ export default function Footer() {
         className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 font-display text-[12vw] font-black leading-none select-none pointer-events-none opacity-[0.015] tracking-[0.2em] whitespace-nowrap"
         style={{ color: "#d9a54c" }}
       >
-        BREWHAVEN
+        {((settings?.cafeName) || "DRIPSTER").toUpperCase()}
       </div>
 
       <div className="relative max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 z-10">
@@ -62,10 +62,10 @@ export default function Footer() {
           {/* Column 1: Brand & Identity */}
           <div className="space-y-6">
             <Link to="/" className="inline-flex items-center gap-4 font-display font-bold text-3xl group tracking-tight text-cream">
-              <span className="w-12 h-12 rounded-full border-2 border-crema/40 flex items-center justify-center font-mono text-sm text-crema group-hover:border-crema group-hover:bg-crema group-hover:text-espresso transition-all duration-500 shadow-[0_0_15px_rgba(217,165,76,0.1)]">
-                bh
+              <span className="w-12 h-12 rounded-full border-2 border-crema/40 flex items-center justify-center font-mono text-sm text-crema uppercase group-hover:border-crema group-hover:bg-crema group-hover:text-espresso transition-all duration-500 shadow-[0_0_15px_rgba(217,165,76,0.1)]">
+                {((settings?.cafeName) || "Dripster").slice(0, 2).toLowerCase()}
               </span>
-              <span className="group-hover:text-crema transition-colors duration-300">{(settings?.cafeName) || "Brew Haven"}</span>
+              <span className="group-hover:text-crema transition-colors duration-300">{(settings?.cafeName) || "Dripster"}</span>
             </Link>
 
             <p className="text-sm text-cream-dim/80 leading-relaxed max-w-sm">
@@ -214,7 +214,7 @@ export default function Footer() {
         <div className="py-10 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
           
           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 font-mono text-[11px] text-cream-dim/60 tracking-wider">
-            <span>© {new Date().getFullYear()} {((settings?.cafeName) || "BREW HAVEN").toUpperCase()} COFFEE CO.</span>
+            <span>© {new Date().getFullYear()} {((settings?.cafeName) || "DRIPSTER").toUpperCase()} COFFEE CO.</span>
             <span className="hidden md:inline text-cream/20">|</span>
             <span>{((settings?.location) || "MIAN CHANNU, PAKISTAN").toUpperCase()}</span>
           </div>

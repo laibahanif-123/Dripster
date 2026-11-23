@@ -1,3 +1,5 @@
+import { useSettingsStore } from "../store/settingsStore";
+
 const features = [
   {
     icon: "☕",
@@ -26,6 +28,9 @@ const features = [
 ];
 
 export default function Features() {
+  const settings = useSettingsStore((state) => state.settings);
+  const cafeName = settings?.cafeName || "Dripster";
+
   return (
     <section className="py-24 border-t border-cream/5 relative overflow-hidden">
       {/* Subtle background glow */}
@@ -37,7 +42,7 @@ export default function Features() {
       <div className="max-w-[1800px] mx-auto px-8 md:px-16 lg:px-24">
         {/* Section header */}
         <div className="text-center mb-14">
-          <span className="font-mono text-xs tracking-widest uppercase text-crema block mb-3">Why Brew Haven</span>
+          <span className="font-mono text-xs tracking-widest uppercase text-crema block mb-3">Why {cafeName}</span>
           <h2 className="font-display text-4xl md:text-5xl">
             The <span className="text-crema italic font-medium">difference</span> is in the details
           </h2>

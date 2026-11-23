@@ -52,7 +52,7 @@ export default function HowItWorks() {
             </h2>
           </div>
           <p className="text-cream-dim text-sm max-w-xs leading-relaxed md:text-right">
-            From browsing to your first sip — the Brew Haven ordering experience is built to be effortless.
+            From browsing to your first sip — the Dripster ordering experience is built to be effortless.
           </p>
         </div>
 

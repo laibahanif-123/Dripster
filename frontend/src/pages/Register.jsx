@@ -72,10 +72,10 @@ export default function Register() {
         <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/55 to-espresso/15" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-espresso" />
 
-        {/* BH Badge */}
+        {/* Badge */}
         <Link to="/" className="absolute top-8 left-8 z-20 no-underline">
-          <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso/70 backdrop-blur-md flex items-center justify-center font-mono text-[11px] tracking-widest text-crema hover:scale-110 transition-transform">
-            bh
+          <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso/70 backdrop-blur-md flex items-center justify-center font-mono text-[11px] tracking-widest text-crema uppercase hover:scale-110 transition-transform">
+            dr
           </div>
         </Link>
 
@@ -84,9 +84,9 @@ export default function Register() {
           className="absolute bottom-0 left-0 right-0 p-10 z-20"
           style={{ animation: mounted ? "slideInLeft 0.8s ease both" : "none", animationDelay: "0.2s" }}
         >
-          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-crema mb-4">☕ Brew Haven</p>
+          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-crema mb-4">☕ Dripster</p>
           <h2 className="font-display text-4xl text-cream leading-snug mb-6">
-            Join the haven,<br />
+            Join the community,<br />
             <span className="text-crema italic">skip the line.</span>
           </h2>
           <div className="w-12 h-px bg-crema/40 mb-6" />
@@ -118,8 +118,8 @@ export default function Register() {
         {/* Mobile Logo */}
         <div className="lg:hidden mb-6">
           <Link to="/" className="no-underline">
-            <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema">
-              bh
+            <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema uppercase">
+              dr
             </div>
           </Link>
         </div>
@@ -131,8 +131,8 @@ export default function Register() {
           {/* Desktop Logo */}
           <div className="hidden lg:flex justify-center mb-6">
             <Link to="/" className="no-underline">
-              <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-[11px] tracking-widest text-crema hover:scale-110 transition-transform">
-                bh
+              <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-[11px] tracking-widest text-crema uppercase hover:scale-110 transition-transform">
+                dr
               </div>
             </Link>
           </div>

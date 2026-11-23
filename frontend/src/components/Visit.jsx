@@ -228,7 +228,7 @@ export default function Visit() {
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Brew Haven Map"
+                  title="Dripster Map"
                 ></iframe>
                 <div className="absolute inset-0 pointer-events-none border border-white/10 group-hover:border-crema/20 transition-colors duration-300 rounded-xl" />
               </div>

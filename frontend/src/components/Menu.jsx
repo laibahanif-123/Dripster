@@ -46,12 +46,14 @@ export default function Menu() {
 
         {/* Menu Items */}
         <div className="border-t border-cream/10">
-          {items.map((item, idx) => (
-            <Link
-              to={`/product/${item._id}`}
-              key={item._id}
-              className="group grid grid-cols-[72px_1fr_auto] items-center gap-6 py-6 border-b border-cream/10 hover:bg-white/[0.02] transition-colors duration-300 px-3 -mx-3 rounded"
-            >
+          {items.map((item) => {
+            const itemId = item._id || item.id;
+            return (
+              <Link
+                to={`/product/${itemId}`}
+                key={itemId}
+                className="group grid grid-cols-[72px_1fr_auto] items-center gap-6 py-6 border-b border-cream/10 hover:bg-white/[0.02] transition-colors duration-300 px-3 -mx-3 rounded"
+              >
               {/* Image */}
               <div className="w-[72px] h-[72px] rounded-full overflow-hidden border-2 border-cream/10 group-hover:border-crema/40 transition-colors duration-300 flex-shrink-0">
                 <img
@@ -83,7 +85,8 @@ export default function Menu() {
                 <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-cream-dim">→</span>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom CTA */}

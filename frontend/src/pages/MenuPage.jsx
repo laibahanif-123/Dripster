@@ -11,8 +11,19 @@ const FALLBACK_IMG = "https://images.unsplash.com/photo-1442512595331-e89e73853f
 export default function MenuPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [addedId, setAddedId] = useState(null);
+
+  const handleAddToCart = (p) => {
+    const prodId = p._id || p.id;
+    useCartStore.getState().addItem({ ...p, id: prodId });
+    setAddedId(prodId);
+    setTimeout(() => {
+      setAddedId((curr) => (curr === prodId ? null : curr));
+    }, 1200);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -79,38 +90,46 @@ export default function MenuPage() {
           <p className="text-cream-dim text-sm">No products match your search.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
-            {filtered.map((p) => (
-              <div key={p._id} className="bg-espresso-2 rounded overflow-hidden border border-cream/10 group">
-                <Link to={`/product/${p._id}`}>
-                  <div className="h-48 overflow-hidden bg-espresso">
-                    <img
-                      src={p.img}
-                      alt={p.name}
-                      onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMG; }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                    />
-                  </div>
-                </Link>
-                <div className="p-5">
-                  <div className="flex justify-between items-start">
-                    <Link to={`/product/${p._id}`}>
-                      <h3 className="font-display text-lg hover:text-crema transition">{p.name}</h3>
-                    </Link>
-                    <span className="font-mono text-xs text-crema">★ {p.rating}</span>
-                  </div>
-                  <p className="text-cream-dim text-xs mt-1.5 mb-4">{p.desc}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono text-crema">Rs. {p.price}</span>
-                    <button
-                      onClick={() => useCartStore.getState().addItem({ ...p, id: p._id })}
-                      className="font-mono text-xs bg-rust hover:bg-rust-deep px-4 py-2 transition"
-                    >
-                      Add to Cart
-                    </button>
+            {filtered.map((p) => {
+              const prodId = p._id || p.id;
+              const isAdded = addedId === prodId;
+              return (
+                <div key={prodId} className="bg-espresso-2 rounded overflow-hidden border border-cream/10 group">
+                  <Link to={`/product/${prodId}`}>
+                    <div className="h-48 overflow-hidden bg-espresso">
+                      <img
+                        src={p.img}
+                        alt={p.name}
+                        onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMG; }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    </div>
+                  </Link>
+                  <div className="p-5">
+                    <div className="flex justify-between items-start">
+                      <Link to={`/product/${prodId}`}>
+                        <h3 className="font-display text-lg hover:text-crema transition">{p.name}</h3>
+                      </Link>
+                      <span className="font-mono text-xs text-crema">★ {p.rating}</span>
+                    </div>
+                    <p className="text-cream-dim text-xs mt-1.5 mb-4">{p.desc}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="font-mono text-crema">Rs. {p.price}</span>
+                      <button
+                        onClick={() => handleAddToCart(p)}
+                        className={`font-mono text-xs px-4 py-2 transition rounded font-medium ${
+                          isAdded
+                            ? "bg-emerald-600 text-cream"
+                            : "bg-rust hover:bg-rust-deep text-cream"
+                        }`}
+                      >
+                        {isAdded ? "Added ✓" : "Add to Cart"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -30,12 +30,12 @@ export default function ProductDetails() {
         if (data && data._id) {
           setProduct(data);
         } else {
-          const found = fallbackProducts.find((p) => String(p.id) === String(id) || String(p._id) === String(id));
+          const found = fallbackProducts.find((p) => (p.id && String(p.id) === String(id)) || (p._id && String(p._id) === String(id)));
           if (found) setProduct(found);
           else setError("Product not found.");
         }
       } catch (err) {
-        const found = fallbackProducts.find((p) => String(p.id) === String(id) || String(p._id) === String(id));
+        const found = fallbackProducts.find((p) => (p.id && String(p.id) === String(id)) || (p._id && String(p._id) === String(id)));
         if (found) {
           setProduct(found);
         } else {
@@ -75,14 +75,15 @@ export default function ProductDetails() {
   const finalPrice = product.price + priceAdjust;
 
   const handleAddToCart = () => {
+    const prodId = product._id || product.id;
     addItem({
       ...product,
-      id: product._id,
+      id: prodId,
       price: finalPrice,
       name: `${product.name} (${size})`,
     });
     for (let i = 1; i < qty; i++) {
-      addItem({ ...product, id: product._id, price: finalPrice, name: `${product.name} (${size})` });
+      addItem({ ...product, id: prodId, price: finalPrice, name: `${product.name} (${size})` });
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);

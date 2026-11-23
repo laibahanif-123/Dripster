@@ -3,12 +3,14 @@ import api from "../services/api";
 
 export const useSettingsStore = create((set) => ({
   settings: {
-    cafeName: "Brew Haven",
+    cafeName: "Dripster",
     location: "Mian Channu, Punjab, Pakistan",
     phone: "+92 300 0000000",
-    email: "hello@brewhaven.pk",
+    email: "hello@dripster.pk",
     openingHours: "7:00 AM – 9:00 PM (Daily)",
     established: "2026",
+    tagline: "Where Every Sip Hits The Spot",
+    website: "https://dripster.pk",
   },
   loading: false,
   error: null,

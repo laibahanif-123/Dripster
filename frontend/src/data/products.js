@@ -235,4 +235,6 @@ const products = [
 
 export const categories = ["All", "Hot Coffee", "Cold Coffee", "Tea", "Pastries", "Cakes", "Snacks"];
 
-export default products;
+const normalizedProducts = products.map((p) => ({ ...p, _id: p._id || String(p.id) }));
+
+export default normalizedProducts;

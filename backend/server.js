@@ -42,7 +42,7 @@ app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/settings", require("./routes/settingRoutes"));
 
 app.get("/", (req, res) => {
-  res.send("☕ Brew Haven API is running...");
+  res.send("☕ Dripster API is running...");
 });
 
 // 404 handler

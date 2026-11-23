@@ -63,7 +63,7 @@ export default function Story() {
 
           <div className="space-y-4 mb-10">
             <p className="text-cream-dim text-base leading-relaxed max-w-md">
-              Brew Haven started as a single roaster in a garage — today, we're doing it the slow way: small-batch roasting, direct trade with growers, and a bar built for conversation.
+              Dripster started as a single roaster in a garage — today, we're doing it the slow way: small-batch roasting, direct trade with growers, and a bar built for conversation.
             </p>
             <p className="text-cream-dim text-base leading-relaxed max-w-md">
               No syrup pumps, no shortcuts. Just beans we'd drink ourselves, poured by people who care where they came from.

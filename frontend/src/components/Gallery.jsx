@@ -57,12 +57,12 @@ export default function Gallery() {
           <div>
             <span className="font-mono text-xs tracking-widest uppercase text-crema">Gallery</span>
             <h2 className="font-display text-4xl md:text-6xl mt-2">
-              Inside the <span className="text-crema italic font-medium">haven</span>
+              Inside <span className="text-crema italic font-medium">Dripster</span>
             </h2>
           </div>
           <div className="flex flex-col items-start md:items-end gap-3">
             <p className="text-cream-dim text-sm max-w-xs md:text-right">
-              Every corner of Brew Haven is designed for comfort, calm, and great light.
+              Every corner of Dripster is designed for comfort, calm, and great light.
             </p>
             <a
               href="https://instagram.com"
@@ -70,7 +70,7 @@ export default function Gallery() {
               rel="noreferrer"
               className="font-mono text-xs text-crema border border-crema/30 hover:bg-crema hover:text-espresso px-4 py-2 transition-all duration-300 flex items-center gap-2"
             >
-              <span>Follow @brewhaven_pk</span>
+              <span>Follow @dripster_pk</span>
               <span>↗</span>
             </a>
           </div>
@@ -117,7 +117,7 @@ export default function Gallery() {
             className="font-mono text-xs tracking-wider hover:text-crema transition-colors flex items-center gap-2 whitespace-nowrap border border-cream/10 hover:border-crema/30 px-5 py-2.5 rounded-full"
           >
             <span>📸</span>
-            <span>@brewhaven_pk</span>
+            <span>@dripster_pk</span>
             <span className="text-crema">↗</span>
           </a>
           <div className="h-px flex-1 bg-cream/8" />

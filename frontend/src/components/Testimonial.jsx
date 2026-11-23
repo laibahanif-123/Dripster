@@ -9,7 +9,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    quote: "I've tried specialty coffee in Dubai and London. Brew Haven holds its own. The cold brew alone is worth the trip.",
+    quote: "I've tried specialty coffee in Dubai and London. Dripster holds its own. The cold brew alone is worth the trip.",
     author: "Bilal M.",
     role: "Designer · Regular since 2024",
     initials: "BM",

@@ -65,6 +65,14 @@ const PublicLayout = () => {
   );
 };
 
+const RootRedirect = () => {
+  const { isAuthenticated } = useAuthStore();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Home />;
+};
+
 function App() {
   const fetchSettings = useSettingsStore((state) => state.fetchSettings);
 
@@ -79,9 +87,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Public Routes (Includes Navbar/Footer, no login required) */}
+        {/* Public Routes (Includes Navbar/Footer) */}
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/product/:id" element={<ProductDetails />} />

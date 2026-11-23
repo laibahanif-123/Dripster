@@ -3,6 +3,7 @@ import { FiShoppingBag, FiMenu, FiX, FiSettings } from "react-icons/fi";
 import { useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
+import { useSettingsStore } from "../store/settingsStore";
 
 function NavHashLink({ to, children, className, onClick }) {
   const navigate = useNavigate();
@@ -34,16 +35,22 @@ export default function Navbar() {
   const totalItems = items.reduce((sum, i) => sum + i.qty, 0);
   const userInfo = useAuthStore((state) => state.userInfo);
   const logout = useAuthStore((state) => state.logout);
+  const settings = useSettingsStore((state) => state.settings);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const cafeName = settings?.cafeName || "Dripster";
+  const initials = cafeName.includes(" ")
+    ? cafeName.split(" ").filter(Boolean).map((w) => w[0]).join("").slice(0, 2).toLowerCase()
+    : cafeName.slice(0, 2).toLowerCase();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 py-4 bg-espresso/95 backdrop-blur-md border-b border-cream/10 transition-all duration-300">
       <div className="max-w-[1800px] mx-auto px-8 md:px-16 lg:px-24 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-xl relative z-[60]">
-          <span className="w-8 h-8 rounded-full border border-crema flex items-center justify-center font-mono text-xs text-crema">
-            bh
+          <span className="w-8 h-8 rounded-full border border-crema flex items-center justify-center font-mono text-xs text-crema uppercase">
+            {initials}
           </span>
-          Brew Haven
+          {cafeName}
         </Link>
 
         {/* Desktop Links */}

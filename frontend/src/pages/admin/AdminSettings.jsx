@@ -46,11 +46,84 @@ export default function AdminSettings() {
   const [showPw, setShowPw] = useState({ cur: false, nw: false, cf: false });
   const [passwordMsg, setPasswordMsg] = useState({});
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [twoFactor, setTwoFactor] = useState(false);
-  const [sessionLog] = useState([
+  const [twoFactor, setTwoFactor] = useState(() => localStorage.getItem("admin_2fa") === "true");
+  const [sessionLog, setSessionLog] = useState([
     { device: "Chrome · Windows", location: "Mian Channu, PK", time: "Just now", active: true },
     { device: "Safari · iPhone", location: "Lahore, PK", time: "2 days ago", active: false },
   ]);
+
+  const handleToggle2FA = () => {
+    const next = !twoFactor;
+    setTwoFactor(next);
+    localStorage.setItem("admin_2fa", String(next));
+    setPasswordMsg({
+      type: "success",
+      text: next ? "Two-Factor Authentication has been enabled." : "Two-Factor Authentication has been disabled.",
+    });
+  };
+
+  const handleRevokeSession = (index) => {
+    setSessionLog((prev) => prev.filter((_, i) => i !== index));
+    setPasswordMsg({ type: "success", text: "Session revoked successfully." });
+  };
+
+  // ── System (Danger Zone & Exports) ──
+  const [systemMsg, setSystemMsg] = useState({});
+  const [exporting, setExporting] = useState(false);
+  const [clearing, setClearing] = useState(false);
+
+  const handleExportAllData = async () => {
+    setExporting(true);
+    setSystemMsg({});
+    try {
+      const [ordersRes, productsRes] = await Promise.all([
+        api.get("/orders"),
+        api.get("/products"),
+      ]);
+      const dataToExport = {
+        appName: "Dripster POS",
+        version: "v1.0.0",
+        exportDate: new Date().toISOString(),
+        totalOrders: ordersRes.data?.length || 0,
+        totalProducts: productsRes.data?.length || 0,
+        orders: ordersRes.data || [],
+        products: productsRes.data || [],
+      };
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Dripster_Export_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setSystemMsg({
+        type: "success",
+        text: `Export successful! Downloaded ${dataToExport.totalOrders} orders and ${dataToExport.totalProducts} products.`,
+      });
+    } catch (err) {
+      setSystemMsg({ type: "error", text: err.response?.data?.message || "Failed to export data." });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleClearAllOrders = async () => {
+    if (!window.confirm("⚠️ ARE YOU SURE? This will permanently delete ALL customer orders from the database. This action is irreversible.")) {
+      return;
+    }
+    setClearing(true);
+    setSystemMsg({});
+    try {
+      const { data } = await api.delete("/orders/clear/all");
+      setSystemMsg({ type: "success", text: data.message || "All orders have been permanently cleared." });
+    } catch (err) {
+      setSystemMsg({ type: "error", text: err.response?.data?.message || "Failed to clear orders." });
+    } finally {
+      setClearing(false);
+    }
+  };
 
   // ── Cafe ──
   const [cafeSettings, setCafeSettings] = useState({ cafeName: "", location: "", phone: "", email: "", openingHours: "", established: "", tagline: "", website: "" });
@@ -185,7 +258,7 @@ export default function AdminSettings() {
               </div>
               <Field label="Email Address">
                 <input type="email" name="email" value={profile.email} onChange={e => setProfile(p => ({ ...p, email: e.target.value }))}
-                  className={inputCls} placeholder="admin@brewhaven.pk" />
+                  className={inputCls} placeholder="admin@dripster.pk" />
               </Field>
               <button type="submit" disabled={profileLoading}
                 className="w-full bg-crema hover:bg-crema-soft text-espresso py-3 rounded-lg font-mono text-xs uppercase tracking-widest transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2">
@@ -248,7 +321,7 @@ export default function AdminSettings() {
                     <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">Extra login security</p>
                   </div>
                 </div>
-                <button onClick={() => setTwoFactor(p => !p)}
+                <button onClick={handleToggle2FA}
                   className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${twoFactor ? "bg-crema" : "bg-cream/20"}`}>
                   <span className={`absolute top-1 w-4 h-4 rounded-full bg-espresso transition-all duration-300 ${twoFactor ? "left-7" : "left-1"}`} />
                 </button>
@@ -276,7 +349,7 @@ export default function AdminSettings() {
                     </div>
                     {s.active
                       ? <span className="flex items-center gap-1.5 font-mono text-[10px] text-green-400"><span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />Active</span>
-                      : <button className="font-mono text-[10px] text-rust hover:text-rust-deep transition-colors uppercase tracking-wider">Revoke</button>
+                      : <button onClick={() => handleRevokeSession(i)} className="font-mono text-[10px] text-rust hover:text-rust-deep transition-colors uppercase tracking-wider">Revoke</button>
                     }
                   </div>
                 ))}
@@ -301,11 +374,11 @@ export default function AdminSettings() {
               <Alert msg={cafeMsg} />
               <Field label="Cafe Name">
                 <input type="text" name="cafeName" value={cafeSettings.cafeName} onChange={e => setCafeSettings(p => ({ ...p, cafeName: e.target.value }))}
-                  className={inputCls} placeholder="Brew Haven" />
+                  className={inputCls} placeholder="Dripster" />
               </Field>
               <Field label="Tagline">
                 <input type="text" name="tagline" value={cafeSettings.tagline} onChange={e => setCafeSettings(p => ({ ...p, tagline: e.target.value }))}
-                  className={inputCls} placeholder="Where every sip tells a story" />
+                  className={inputCls} placeholder="Where every sip hits the spot" />
               </Field>
               <Field label="Location / Address">
                 <input type="text" name="location" value={cafeSettings.location} onChange={e => setCafeSettings(p => ({ ...p, location: e.target.value }))}
@@ -318,7 +391,7 @@ export default function AdminSettings() {
                 </Field>
                 <Field label="Email">
                   <input type="email" name="email" value={cafeSettings.email} onChange={e => setCafeSettings(p => ({ ...p, email: e.target.value }))}
-                    className={inputCls} placeholder="hello@brewhaven.pk" />
+                    className={inputCls} placeholder="hello@dripster.pk" />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -333,7 +406,7 @@ export default function AdminSettings() {
               </div>
               <Field label="Website">
                 <input type="url" name="website" value={cafeSettings.website} onChange={e => setCafeSettings(p => ({ ...p, website: e.target.value }))}
-                  className={inputCls} placeholder="https://brewhaven.pk" />
+                  className={inputCls} placeholder="https://dripster.pk" />
               </Field>
               <button type="submit" disabled={cafeLoading}
                 className="w-full bg-crema hover:bg-crema-soft text-espresso py-3 rounded-lg font-mono text-xs uppercase tracking-widest transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2">
@@ -347,7 +420,7 @@ export default function AdminSettings() {
             <h2 className="font-display text-xl text-cream mb-6">Live Preview</h2>
             <div className="space-y-4">
               <div className="p-5 bg-espresso/60 rounded-xl border border-cream/10">
-                <p className="font-display text-2xl text-crema">{cafeSettings.cafeName || "Brew Haven"}</p>
+                <p className="font-display text-2xl text-crema">{cafeSettings.cafeName || "Dripster"}</p>
                 {cafeSettings.tagline && <p className="font-mono text-xs text-cream-dim mt-1 italic">"{cafeSettings.tagline}"</p>}
               </div>
               {[
@@ -373,91 +446,102 @@ export default function AdminSettings() {
 
       {/* ════ SYSTEM TAB ════ */}
       {activeTab === "system" && (
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* App Info */}
-          <div className="bg-espresso-2/40 border border-cream/10 rounded-2xl p-7">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-xl">⚙️</span>
-              <div>
-                <h2 className="font-display text-xl text-cream">System Info</h2>
-                <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">App &amp; version details</p>
-              </div>
-            </div>
-            <div className="space-y-1">
-              {[
-                { label: "App Name",     value: "Brew Haven POS" },
-                { label: "Version",      value: "v1.0.0" },
-                { label: "Stack",        value: "MERN · Tailwind · Vercel" },
-                { label: "Database",     value: "MongoDB Atlas" },
-                { label: "Auth",         value: "JWT · Bcrypt" },
-                { label: "Role",         value: "Administrator" },
-                { label: "Admin ID",     value: userInfo?._id?.slice(-8)?.toUpperCase() || "—" },
-                { label: "Developed By", value: "Laiba Hanif", highlight: true },
-              ].map(({ label, value, highlight }) => (
-                <div key={label} className="flex items-center justify-between py-3 border-b border-cream/8 last:border-0">
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-cream-dim">{label}</span>
-                  <span className={`font-mono text-xs ${highlight ? "text-crema" : "text-cream"}`}>{value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 flex items-center gap-2 p-3 bg-green-900/10 border border-green-500/20 rounded-lg">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="font-mono text-[11px] text-green-400 uppercase tracking-wider">System Online</span>
-            </div>
-          </div>
-
-          {/* Quick Stats + Danger Zone */}
-          <div className="space-y-6">
+        <div className="space-y-6">
+          <Alert msg={systemMsg} />
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* App Info */}
             <div className="bg-espresso-2/40 border border-cream/10 rounded-2xl p-7">
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-xl">📊</span>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-xl">⚙️</span>
                 <div>
-                  <h2 className="font-display text-lg text-cream">Quick Stats</h2>
-                  <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">At a glance</p>
+                  <h2 className="font-display text-xl text-cream">System Info</h2>
+                  <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">App &amp; version details</p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
                 {[
-                  { label: "Last Login", value: "Today" },
-                  { label: "Time Zone", value: "PKT +5:00" },
-                  { label: "Language", value: "English" },
-                  { label: "Currency", value: "PKR (Rs.)" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="p-4 bg-espresso/50 rounded-xl border border-cream/8 text-center">
-                    <p className="font-mono text-xs text-cream">{value}</p>
-                    <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider mt-1">{label}</p>
+                  { label: "App Name",     value: "Dripster POS" },
+                  { label: "Version",      value: "v1.0.0" },
+                  { label: "Stack",        value: "MERN · Tailwind · Vercel" },
+                  { label: "Database",     value: "MongoDB" },
+                  { label: "Auth",         value: "JWT · Bcrypt" },
+                  { label: "Role",         value: "Administrator" },
+                  { label: "Admin ID",     value: userInfo?._id?.slice(-8)?.toUpperCase() || "—" },
+                  { label: "Developed By", value: "Laiba Hanif", highlight: true },
+                ].map(({ label, value, highlight }) => (
+                  <div key={label} className="flex items-center justify-between py-3 border-b border-cream/8 last:border-0">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-cream-dim">{label}</span>
+                    <span className={`font-mono text-xs ${highlight ? "text-crema" : "text-cream"}`}>{value}</span>
                   </div>
                 ))}
               </div>
+              <div className="mt-5 flex items-center gap-2 p-3 bg-green-900/10 border border-green-500/20 rounded-lg">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="font-mono text-[11px] text-green-400 uppercase tracking-wider">System Online</span>
+              </div>
             </div>
 
-            {/* Danger Zone */}
-            <div className="bg-rust-deep/10 border border-rust/20 rounded-2xl p-7">
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-xl">⚠️</span>
-                <div>
-                  <h2 className="font-display text-lg text-rust">Danger Zone</h2>
-                  <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">Irreversible actions</p>
+            {/* Quick Stats + Danger Zone */}
+            <div className="space-y-6">
+              <div className="bg-espresso-2/40 border border-cream/10 rounded-2xl p-7">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="text-xl">📊</span>
+                  <div>
+                    <h2 className="font-display text-lg text-cream">Quick Stats</h2>
+                    <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">At a glance</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Last Login", value: "Today" },
+                    { label: "Time Zone", value: "PKT +5:00" },
+                    { label: "Language", value: "English" },
+                    { label: "Currency", value: "PKR (Rs.)" },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="p-4 bg-espresso/50 rounded-xl border border-cream/8 text-center">
+                      <p className="font-mono text-xs text-cream">{value}</p>
+                      <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider mt-1">{label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-espresso/40 rounded-lg border border-cream/8">
+
+              {/* Danger Zone */}
+              <div className="bg-rust-deep/10 border border-rust/20 rounded-2xl p-7">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="text-xl">⚠️</span>
                   <div>
-                    <p className="font-mono text-xs text-cream">Export All Data</p>
-                    <p className="font-mono text-[10px] text-cream-dim mt-0.5">Download orders &amp; products</p>
+                    <h2 className="font-display text-lg text-rust">Danger Zone</h2>
+                    <p className="font-mono text-[10px] text-cream-dim uppercase tracking-wider">Irreversible actions</p>
                   </div>
-                  <button className="px-4 py-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/20 rounded-lg font-mono text-[11px] uppercase tracking-wider transition-colors">
-                    Export
-                  </button>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-rust-deep/10 rounded-lg border border-rust/20">
-                  <div>
-                    <p className="font-mono text-xs text-rust">Clear All Orders</p>
-                    <p className="font-mono text-[10px] text-cream-dim mt-0.5">Permanently delete order history</p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-espresso/40 rounded-lg border border-cream/8">
+                    <div>
+                      <p className="font-mono text-xs text-cream">Export All Data</p>
+                      <p className="font-mono text-[10px] text-cream-dim mt-0.5">Download orders &amp; products</p>
+                    </div>
+                    <button
+                      onClick={handleExportAllData}
+                      disabled={exporting}
+                      className="px-4 py-2 bg-cream/10 hover:bg-cream/20 text-cream border border-cream/20 rounded-lg font-mono text-[11px] uppercase tracking-wider transition-colors disabled:opacity-50"
+                    >
+                      {exporting ? "Exporting..." : "Export"}
+                    </button>
                   </div>
-                  <button className="px-4 py-2 bg-rust/20 hover:bg-rust/30 text-rust border border-rust/30 rounded-lg font-mono text-[11px] uppercase tracking-wider transition-colors">
-                    Clear
-                  </button>
+                  <div className="flex items-center justify-between p-3 bg-rust-deep/10 rounded-lg border border-rust/20">
+                    <div>
+                      <p className="font-mono text-xs text-rust">Clear All Orders</p>
+                      <p className="font-mono text-[10px] text-cream-dim mt-0.5">Permanently delete order history</p>
+                    </div>
+                    <button
+                      onClick={handleClearAllOrders}
+                      disabled={clearing}
+                      className="px-4 py-2 bg-rust/20 hover:bg-rust/30 text-rust border border-rust/30 rounded-lg font-mono text-[11px] uppercase tracking-wider transition-colors disabled:opacity-50"
+                    >
+                      {clearing ? "Clearing..." : "Clear"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

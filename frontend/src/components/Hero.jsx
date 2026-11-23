@@ -18,7 +18,7 @@ const slides = [
     img: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1800&q=80",
     tagline: "Your favourite spot,",
     highlight: "now online.",
-    sub: "Order ahead, reserve your table, and earn rewards with every visit. Brew Haven, anywhere you are.",
+    sub: "Order ahead, reserve your table, and earn rewards with every visit. Dripster, anywhere you are.",
   },
 ];
 

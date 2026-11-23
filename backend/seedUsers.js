@@ -13,13 +13,16 @@ const seedUsers = async () => {
     let admin = await User.findOne({ email: "laibahanif0909@gmail.com" });
     if (!admin) {
       admin = await User.create({
-        name: "Admin User",
+        name: "laiba hanif",
         email: "laibahanif0909@gmail.com",
+        phone: "03017810816",
         password: "password123",
         isAdmin: true,
       });
       console.log("👑 Admin user created with password: password123");
     } else {
+      admin.name = "laiba hanif";
+      admin.phone = "03017810816";
       admin.password = "password123";
       admin.isAdmin = true;
       await admin.save();
